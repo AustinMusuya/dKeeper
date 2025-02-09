@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { dKeeper_backend } from "declarations/dKeeper_backend";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
@@ -10,11 +10,22 @@ function App() {
 
   function addNote(newNote) {
     setNotes((prevNotes) => {
-      return [...prevNotes, newNote];
+      dKeeper_backend.createNote(newNote.title, newNote.content);
+      return [newNote, ...prevNotes];
     });
   }
+  useEffect(() => {
+    console.log("I'm walking here!");
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    const notesArray = await dKeeper_backend.readNotes();
+    setNotes(notesArray);
+  };
 
   function deleteNote(id) {
+    dKeeper_backend.removeNote(id);
     setNotes((prevNotes) => {
       return prevNotes.filter((noteItem, index) => {
         return index !== id;
